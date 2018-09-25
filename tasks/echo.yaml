@@ -1,2 +1,7 @@
 ---
 summary: Output the passed in parameters.
+
+description: |
+  The `echo` task spits out the parameters passed to it.
+
+  This is useful for testing the `run` command.

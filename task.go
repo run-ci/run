@@ -12,7 +12,8 @@ import (
 type Task struct {
 	Name string // Name comes from the name of the file.
 
-	Summary string `yaml:"summary"`
+	Summary     string `yaml:"summary"`
+	Description string `yaml:"description"`
 }
 
 // LoadTask loads a task from a YAML file and returns it.

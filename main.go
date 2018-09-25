@@ -11,9 +11,11 @@ var verbose bool
 
 func main() {
 	var list bool
+	var taskname string
 
 	flag.BoolVarP(&list, "list", "l", false, "list all tasks")
 	flag.BoolVarP(&verbose, "verbose", "v", false, "print debug output")
+	flag.StringVarP(&taskname, "describe", "d", "", "describe target task")
 	flag.Parse()
 
 	switch {
@@ -23,6 +25,10 @@ func main() {
 		if err != nil {
 			printFatal("error listing tasks: %v", err)
 		}
+
+	case taskname != "":
+		printDebug("describe called with taskname %v", taskname)
+		runDescribe(taskname)
 	}
 }
 
