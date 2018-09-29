@@ -25,4 +25,22 @@ func runDescribe(name string) {
 	}
 
 	fmt.Println(line)
+
+	fmt.Println("## Arguments")
+	for k, arg := range task.Arguments {
+		line := k
+
+		if arg.Description != "" {
+			line = fmt.Sprintf("%v: %v", line, arg.Description)
+		}
+
+		if line[len(line)-1] != '\n' {
+			printDebug("found line without newline")
+			line = fmt.Sprintf("%v\n", line)
+		}
+
+		fmt.Print(line)
+	}
+
+	fmt.Println()
 }
