@@ -34,6 +34,10 @@ func runDescribe(name string) {
 			line = fmt.Sprintf("%v: %v", line, arg.Description)
 		}
 
+		if arg.Default != "" {
+			line = fmt.Sprintf("%v (defaults to %v)", line, arg.Default)
+		}
+
 		if line[len(line)-1] != '\n' {
 			printDebug("found line without newline")
 			line = fmt.Sprintf("%v\n", line)
