@@ -18,6 +18,7 @@ type Task struct {
 
 	Image     string         `yaml:"image"`
 	Command   string         `yaml:"command"`
+	Mount     string         `yaml:"mount"`
 	Arguments map[string]Arg `yaml:"arguments"`
 }
 
@@ -29,14 +30,30 @@ type Arg struct {
 
 // LoadTask loads a task from a YAML file and returns it.
 func LoadTask(name string) (Task, error) {
-	path := fmt.Sprintf("./tasks/%v.yaml", name)
+	pwd, err := os.Getwd()
+	if err != nil {
+		return Task{}, err
+	}
+
+	printDebug("looking for tasks in %v", pwd)
+
+	path := fmt.Sprintf("%v/tasks/%v.yaml", pwd, name)
 	f, err := ioutil.ReadFile(path)
 	if err != nil {
 		return Task{}, err
 	}
 
 	task := Task{Name: name}
-	return task, yaml.UnmarshalStrict(f, &task)
+	err = yaml.UnmarshalStrict(f, &task)
+	if err != nil {
+		return task, err
+	}
+
+	if task.Mount == "" {
+		task.Mount = "/mnt/repo"
+	}
+
+	return task, nil
 }
 
 // GetCmd returns the task's command as a CMD for the Docker

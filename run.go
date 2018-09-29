@@ -26,9 +26,26 @@ func runTask(name string) {
 		AttachStderr: true,
 		AttachStdout: true,
 		Env:          env,
+		Volumes: map[string]struct{}{
+			task.Mount: struct{}{},
+		},
+		WorkingDir: task.Mount,
 	}
 
-	hcfg := &docker.HostConfig{}
+	pwd, err := os.Getwd()
+	if err != nil {
+		printFatal("error getting current working directory: %v", err)
+	}
+
+	hcfg := &docker.HostConfig{
+		Mounts: []docker.HostMount{
+			docker.HostMount{
+				Target: task.Mount,
+				Source: pwd,
+				Type:   "bind",
+			},
+		},
+	}
 
 	ncfg := &docker.NetworkingConfig{}
 
