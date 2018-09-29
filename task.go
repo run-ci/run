@@ -14,6 +14,8 @@ type Task struct {
 
 	Summary     string `yaml:"summary"`
 	Description string `yaml:"description"`
+
+	Image string `yaml:"image"`
 }
 
 // LoadTask loads a task from a YAML file and returns it.

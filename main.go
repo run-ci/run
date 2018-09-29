@@ -29,12 +29,17 @@ func main() {
 	case taskname != "":
 		printDebug("describe called with taskname %v", taskname)
 		runDescribe(taskname)
+
+	default:
+		taskname := os.Args[1]
+		printDebug("running task %v", taskname)
+		runTask(taskname)
 	}
 }
 
 func printDebug(msg string, args ...interface{}) {
 	if verbose {
-		msg = fmt.Sprintf("[DEBUG] %v\n", msg)
+		msg = fmt.Sprintf("%v\n", msg)
 
 		fmt.Printf(msg, args...)
 	}
