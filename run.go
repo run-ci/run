@@ -10,7 +10,7 @@ import (
 func runTask(name string) {
 	task, err := LoadTask(name)
 	if err != nil {
-		printDebug("got error %v for task %v, skipping...", err, name)
+		printFatal("error loading task %v: %v", name, err)
 	}
 
 	printDebug("task %v loaded", task.Name)

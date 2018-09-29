@@ -31,7 +31,7 @@ func main() {
 		runDescribe(taskname)
 
 	default:
-		taskname := os.Args[1]
+		taskname := os.Args[len(os.Args)-1]
 		printDebug("running task %v", taskname)
 		runTask(taskname)
 	}
@@ -47,7 +47,7 @@ func printDebug(msg string, args ...interface{}) {
 
 func printFatal(msg string, args ...interface{}) {
 	msg = fmt.Sprintf("%v\n", msg)
-	fmt.Printf(msg, args)
+	fmt.Printf(msg, args...)
 
 	os.Exit(1)
 }
