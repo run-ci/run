@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	docker "github.com/fsouza/go-dockerclient"
 )
@@ -19,6 +20,30 @@ func runTask(name string) {
 	if err != nil {
 		printFatal("error loading task arguments: %v", err)
 	}
+
+	client, err := docker.NewClient("unix:///var/run/docker.sock")
+	if err != nil {
+		printFatal("error opening docker socket: %v", err)
+	}
+
+	printDebug("docker client initialized")
+
+	imgsegs := strings.Split(task.Image, ":")
+	pullopts := docker.PullImageOptions{
+		Repository: imgsegs[0],
+		Tag:        imgsegs[1],
+	}
+
+	if verbose {
+		pullopts.OutputStream = os.Stdout
+	}
+
+	err = client.PullImage(pullopts, docker.AuthConfiguration{})
+	if err != nil {
+		printFatal("error pulling image %v: %v", task.Image, err)
+	}
+
+	printDebug("image %v pulled", task.Image)
 
 	ccfg := &docker.Config{
 		Image:        task.Image,
@@ -48,13 +73,6 @@ func runTask(name string) {
 	}
 
 	ncfg := &docker.NetworkingConfig{}
-
-	client, err := docker.NewClient("unix:///var/run/docker.sock")
-	if err != nil {
-		printFatal("error opening docker socket: %v", err)
-	}
-
-	printDebug("docker client initialized")
 
 	cnt, err := client.CreateContainer(docker.CreateContainerOptions{
 		Config:           ccfg,

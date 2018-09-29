@@ -7,7 +7,7 @@ description: |
   This task runs in a Linux container. If working on Mac OS
   make sure to set GOOS appropriately.
 
-image: golang:1.11-stretch
+image: golang:1.11-alpine
 
 mount: /go/src/gitlab.com/run-ci/run
 
