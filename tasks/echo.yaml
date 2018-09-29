@@ -7,3 +7,5 @@ description: |
   This is useful for testing the `run` command.
 
 image: ubuntu:18.04
+
+command: echo foo

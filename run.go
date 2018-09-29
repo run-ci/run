@@ -17,7 +17,7 @@ func runTask(name string) {
 
 	ccfg := &docker.Config{
 		Image:        task.Image,
-		Cmd:          []string{"echo", "foo"},
+		Cmd:          task.GetCmd(),
 		AttachStderr: true,
 		AttachStdout: true,
 	}

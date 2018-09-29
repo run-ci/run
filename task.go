@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"strings"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -15,7 +16,8 @@ type Task struct {
 	Summary     string `yaml:"summary"`
 	Description string `yaml:"description"`
 
-	Image string `yaml:"image"`
+	Image   string `yaml:"image"`
+	Command string `yaml:"command"`
 }
 
 // LoadTask loads a task from a YAML file and returns it.
@@ -28,4 +30,11 @@ func LoadTask(name string) (Task, error) {
 
 	task := Task{Name: name}
 	return task, yaml.UnmarshalStrict(f, &task)
+}
+
+// GetCmd returns the tasks command as a CMD for the Docker
+// container to run.
+func (t Task) GetCmd() []string {
+	printDebug("task %v - getting cmd", t.Name)
+	return strings.Split(t.Command, " ")
 }
