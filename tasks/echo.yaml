@@ -8,4 +8,9 @@ description: |
 
 image: ubuntu:18.04
 
-command: echo foo
+command: echo $FOO
+
+arguments:
+  FOO:
+    description: An argument to pass to the task.
+    default: bar

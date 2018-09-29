@@ -13,13 +13,19 @@ func runTask(name string) {
 		printFatal("error loading task %v: %v", name, err)
 	}
 
-	printDebug("task %v loaded", task.Name)
+	printDebug("task %#v loaded", task)
+
+	env, err := task.GetEnv()
+	if err != nil {
+		printFatal("error loading task arguments: %v", err)
+	}
 
 	ccfg := &docker.Config{
 		Image:        task.Image,
 		Cmd:          task.GetCmd(),
 		AttachStderr: true,
 		AttachStdout: true,
+		Env:          env,
 	}
 
 	hcfg := &docker.HostConfig{}

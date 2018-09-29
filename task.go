@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"strings"
+	"os"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -16,8 +16,15 @@ type Task struct {
 	Summary     string `yaml:"summary"`
 	Description string `yaml:"description"`
 
-	Image   string `yaml:"image"`
-	Command string `yaml:"command"`
+	Image     string         `yaml:"image"`
+	Command   string         `yaml:"command"`
+	Arguments map[string]Arg `yaml:"arguments"`
+}
+
+// Arg is a parameter passed to the task.
+type Arg struct {
+	Description string `yaml:"description"`
+	Default     string `yaml:"default"`
 }
 
 // LoadTask loads a task from a YAML file and returns it.
@@ -32,9 +39,35 @@ func LoadTask(name string) (Task, error) {
 	return task, yaml.UnmarshalStrict(f, &task)
 }
 
-// GetCmd returns the tasks command as a CMD for the Docker
+// GetCmd returns the task's command as a CMD for the Docker
 // container to run.
 func (t Task) GetCmd() []string {
 	printDebug("task %v - getting cmd", t.Name)
-	return strings.Split(t.Command, " ")
+
+	// Docker won't do environment variable substitution when
+	// CMD is passed as an array. This is their suggested
+	// workaround in the docs.
+	return []string{"sh", "-c", t.Command}
+}
+
+// GetEnv returns the task's arguments as ENVs for the Docker
+// container to run.
+func (t Task) GetEnv() ([]string, error) {
+	env := []string{}
+
+	for k, arg := range t.Arguments {
+		val := arg.Default
+		override := os.Getenv(k)
+		if override != "" {
+			val = override
+		}
+
+		if val == "" {
+			return []string{}, fmt.Errorf("argument %v empty", k)
+		}
+
+		env = append(env, fmt.Sprintf("%v=%v", k, val))
+	}
+
+	return env, nil
 }
