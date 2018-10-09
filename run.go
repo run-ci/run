@@ -88,6 +88,12 @@ func runTask(name string) {
 				Source: pwd,
 				Type:   "bind",
 			},
+
+			docker.HostMount{
+				Target: "/var/run/docker.sock",
+				Source: "/var/run/docker.sock",
+				Type:   "bind",
+			},
 		},
 	}
 

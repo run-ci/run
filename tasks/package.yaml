@@ -1,0 +1,13 @@
+---
+summary: Package `run` and its dependencies.
+
+description: |
+  The `package` task packages the `run` binary along with
+  all its dependencies into a Docker container.
+
+  Before running this task, make sure you have an actual
+  binary built. See the `build` task for more details.
+
+image: docker:latest
+
+command: docker build -t run-ci/run .
