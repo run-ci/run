@@ -3,7 +3,15 @@ summary: Package `run` and its dependencies.
 
 description: |
   The `package` task packages the `run` binary along with
-  all its dependencies into a Docker container.
+  all its dependencies into a Docker container. This is
+  useful for testing `run`'s ability to execute Docker
+  commands.
+
+  To run the output of this command, use the following
+
+  ```
+  docker run -it -v $(pwd):/mnt/repo -w /mnt/repo run-ci/run
+  ```
 
   Before running this task, make sure you have an actual
   binary built. See the `build` task for more details.
