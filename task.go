@@ -19,6 +19,7 @@ type Task struct {
 	Image     string         `yaml:"image"`
 	Command   string         `yaml:"command"`
 	Mount     string         `yaml:"mount"`
+	Shell     string         `yaml:"shell"` // Any shell that can take -c to execute commands.
 	Arguments map[string]Arg `yaml:"arguments"`
 }
 
@@ -53,6 +54,10 @@ func LoadTask(name string) (Task, error) {
 		task.Mount = "/mnt/repo"
 	}
 
+	if task.Shell == "" {
+		task.Shell = "sh"
+	}
+
 	return task, nil
 }
 
@@ -64,7 +69,7 @@ func (t Task) GetCmd() []string {
 	// Docker won't do environment variable substitution when
 	// CMD is passed as an array. This is their suggested
 	// workaround in the docs.
-	return []string{"sh", "-c", t.Command}
+	return []string{t.Shell, "-c", t.Command}
 }
 
 // GetEnv returns the task's arguments as ENVs for the Docker

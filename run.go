@@ -27,23 +27,40 @@ func runTask(name string) {
 	}
 
 	printDebug("docker client initialized")
-
 	imgsegs := strings.Split(task.Image, ":")
-	pullopts := docker.PullImageOptions{
-		Repository: imgsegs[0],
-		Tag:        imgsegs[1],
-	}
 
-	if verbose {
-		pullopts.OutputStream = os.Stdout
-	}
+	printDebug("searching for image %v", task.Image)
 
-	err = client.PullImage(pullopts, docker.AuthConfiguration{})
+	imgs, err := client.ListImages(docker.ListImagesOptions{
+		All:    true,
+		Filter: imgsegs[0],
+	})
 	if err != nil {
-		printFatal("error pulling image %v: %v", task.Image, err)
+		printFatal("error searching for image %v: %v", task.Image, err)
 	}
 
-	printDebug("image %v pulled", task.Image)
+	if len(imgs) < 0 {
+		printDebug("image %v not found, pulling", task.Image)
+
+		pullopts := docker.PullImageOptions{
+			Repository: imgsegs[0],
+		}
+
+		if len(imgsegs) > 1 {
+			pullopts.Tag = imgsegs[1]
+		}
+
+		if verbose {
+			pullopts.OutputStream = os.Stdout
+		}
+
+		err = client.PullImage(pullopts, docker.AuthConfiguration{})
+		if err != nil {
+			printFatal("error pulling image %v: %v", task.Image, err)
+		}
+
+		printDebug("image %v pulled", task.Image)
+	}
 
 	ccfg := &docker.Config{
 		Image:        task.Image,
@@ -56,6 +73,8 @@ func runTask(name string) {
 		},
 		WorkingDir: task.Mount,
 	}
+
+	printDebug("container config: %+v", ccfg)
 
 	pwd, err := os.Getwd()
 	if err != nil {
