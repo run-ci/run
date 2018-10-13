@@ -1,11 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"os"
-	"strings"
 
-	docker "github.com/fsouza/go-dockerclient"
+	"gitlab.com/run-ci/run/pkg/run"
 )
 
 func runTask(name string) {
@@ -21,160 +19,45 @@ func runTask(name string) {
 		printFatal("error loading task arguments: %v", err)
 	}
 
-	client, err := docker.NewClient("unix:///var/run/docker.sock")
+	agent, err := run.NewAgent()
 	if err != nil {
-		printFatal("error opening docker socket: %v", err)
+		printFatal("error creating run agent: %v", err)
 	}
 
-	printDebug("docker client initialized")
-	imgsegs := strings.Split(task.Image, ":")
+	printDebug("run agent initialized")
 
-	printDebug("searching for image %v", task.Image)
-
-	imgs, err := client.ListImages(docker.ListImagesOptions{
-		All:    true,
-		Filter: imgsegs[0],
-	})
+	err = agent.VerifyImagePresent(task.Image, true)
 	if err != nil {
-		printFatal("error searching for image %v: %v", task.Image, err)
+		printFatal("error verifying image present: %v", err)
 	}
 
-	if len(imgs) < 0 {
-		printDebug("image %v not found, pulling", task.Image)
-
-		pullopts := docker.PullImageOptions{
-			Repository: imgsegs[0],
-		}
-
-		if len(imgsegs) > 1 {
-			pullopts.Tag = imgsegs[1]
-		}
-
-		if verbose {
-			pullopts.OutputStream = os.Stdout
-		}
-
-		err = client.PullImage(pullopts, docker.AuthConfiguration{})
-		if err != nil {
-			printFatal("error pulling image %v: %v", task.Image, err)
-		}
-
-		printDebug("image %v pulled", task.Image)
-	}
-
-	ccfg := &docker.Config{
-		Image:        task.Image,
-		Cmd:          task.GetCmd(),
-		AttachStderr: true,
-		AttachStdout: true,
-		Env:          env,
-		Volumes: map[string]struct{}{
-			task.Mount: struct{}{},
-		},
-		WorkingDir: task.Mount,
-	}
-
-	printDebug("container config: %+v", ccfg)
+	printDebug("image %v is present in the cache", task.Image)
 
 	pwd, err := os.Getwd()
 	if err != nil {
 		printFatal("error getting current working directory: %v", err)
 	}
 
-	hcfg := &docker.HostConfig{
-		Mounts: []docker.HostMount{
-			docker.HostMount{
-				Target: task.Mount,
-				Source: pwd,
-				Type:   "bind",
-			},
-
-			docker.HostMount{
-				Target: "/var/run/docker.sock",
-				Source: "/var/run/docker.sock",
-				Type:   "bind",
-			},
+	spec := run.ContainerSpec{
+		Imgref: task.Image,
+		Cmd:    task.GetCmd(),
+		Env:    env,
+		Mount: run.Mount{
+			Src:     pwd,
+			Point:   task.Mount,
+			Type:    "bind",
+			Cleanup: true,
 		},
 	}
 
-	ncfg := &docker.NetworkingConfig{}
+	printDebug("running container with spec: %#v", spec)
 
-	cnt, err := client.CreateContainer(docker.CreateContainerOptions{
-		Config:           ccfg,
-		HostConfig:       hcfg,
-		NetworkingConfig: ncfg,
-	})
+	id, status, err := agent.RunContainer(spec)
 	if err != nil {
-		printFatal("error creating container for task: %v", err)
+		printFatal("error running container with id %v: %v", id, err)
 	}
 
-	printDebug("container %v created", cnt.ID)
+	printDebug("task container exited with status %v", status)
 
-	go func() {
-		printDebug("attaching container %v", cnt.ID)
-
-		attachcfg := docker.AttachToContainerOptions{
-			Container: cnt.ID,
-			Stderr:    true,
-			Stdout:    true,
-			Stream:    true,
-			Logs:      true,
-
-			OutputStream: os.Stdout,
-			ErrorStream:  os.Stderr,
-		}
-
-		err = client.AttachToContainer(attachcfg)
-		if err != nil {
-			msgs := fmt.Sprintf("error attaching to task container: %v", err)
-
-			err := cleanupContainer(client, cnt.ID)
-			if err != nil {
-				msgs = fmt.Sprintf("%v\nerror cleaning up container %v: %v", msgs, cnt.ID, err)
-			}
-
-			printFatal(msgs)
-		}
-	}()
-
-	printDebug("starting container %v", cnt.ID)
-
-	err = client.StartContainer(cnt.ID, cnt.HostConfig)
-	if err != nil {
-		msgs := fmt.Sprintf("error starting task container: %v", err)
-
-		err := cleanupContainer(client, cnt.ID)
-		if err != nil {
-			msgs = fmt.Sprintf("%v\nerror cleaning up container %v: %v", msgs, cnt.ID, err)
-		}
-
-		printFatal(msgs)
-	}
-
-	status, err := client.WaitContainer(cnt.ID)
-	if err != nil {
-		msgs := fmt.Sprintf("error running task container: %v", err)
-
-		err := cleanupContainer(client, cnt.ID)
-		if err != nil {
-			msgs = fmt.Sprintf("%v\nerror cleaning up container %v: %v", msgs, cnt.ID, err)
-		}
-
-		printFatal(msgs)
-	}
-
-	fmt.Printf("task container exited with status %v\n", status)
-
-	err = cleanupContainer(client, cnt.ID)
-	if err != nil {
-		printFatal("error cleaning up container %v: %v", cnt.ID, err)
-	}
-}
-
-func cleanupContainer(client *docker.Client, id string) error {
-	return client.RemoveContainer(docker.RemoveContainerOptions{
-		ID:            id,
-		RemoveVolumes: true,
-		Force:         true,
-	})
+	os.Exit(status)
 }

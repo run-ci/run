@@ -72,10 +72,11 @@ func (t Task) GetCmd() []string {
 	return []string{t.Shell, "-c", t.Command}
 }
 
-// GetEnv returns the task's arguments as ENVs for the Docker
-// container to run.
-func (t Task) GetEnv() ([]string, error) {
-	env := []string{}
+// GetEnv returns the task's arguments as key-value pairs.
+// If the environment specifies an argument, that value is
+// used instead of the default value.
+func (t Task) GetEnv() (map[string]string, error) {
+	env := map[string]string{}
 
 	for k, arg := range t.Arguments {
 		val := arg.Default
@@ -85,10 +86,10 @@ func (t Task) GetEnv() ([]string, error) {
 		}
 
 		if val == "" {
-			return []string{}, fmt.Errorf("argument %v empty", k)
+			return map[string]string{}, fmt.Errorf("argument %v empty", k)
 		}
 
-		env = append(env, fmt.Sprintf("%v=%v", k, val))
+		env[k] = val
 	}
 
 	return env, nil
