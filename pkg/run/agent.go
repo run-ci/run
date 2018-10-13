@@ -15,12 +15,17 @@ type Agent struct {
 	client *docker.Client
 }
 
-// NewAgent returns an initialized Agent. This agent is initialized with
-// a Docker client pointing to the Docker socket at `/var/run/docker.sock`.
-func NewAgent() (*Agent, error) {
-	client, err := docker.NewClient("unix:///var/run/docker.sock")
-	if err != nil {
-		return &Agent{}, err
+// NewAgent returns an initialized Agent. By default, this agent is
+// initialized with a Docker client pointing to the Docker socket at
+// `/var/run/docker.sock`, but a custom Docker client can be passed
+// in for use instead.
+func NewAgent(client *docker.Client) (*Agent, error) {
+	if client == nil {
+		var err error
+		client, err = docker.NewClient("unix:///var/run/docker.sock")
+		if err != nil {
+			return &Agent{}, err
+		}
 	}
 
 	return &Agent{

@@ -19,7 +19,7 @@ func runTask(name string) {
 		printFatal("error loading task arguments: %v", err)
 	}
 
-	agent, err := run.NewAgent()
+	agent, err := run.NewAgent(nil)
 	if err != nil {
 		printFatal("error creating run agent: %v", err)
 	}
