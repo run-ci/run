@@ -6,22 +6,22 @@ import (
 )
 
 type Task struct {
-	Name string // Name comes from the name of the file.
+	Name string `yaml:"name" json:"name"`
 
-	Summary     string `yaml:"summary"`
-	Description string `yaml:"description"`
+	Summary     string `yaml:"summary" json:"summary"`
+	Description string `yaml:"description" json:"description"`
 
-	Image     string         `yaml:"image"`
-	Command   string         `yaml:"command"`
-	Mount     string         `yaml:"mount"`
-	Shell     string         `yaml:"shell"` // Any shell that can take -c to execute commands.
-	Arguments map[string]Arg `yaml:"arguments"`
+	Image     string         `yaml:"image" json:"image"`
+	Command   string         `yaml:"command" json:"command"`
+	Mount     string         `yaml:"mount" json:"mount"`
+	Shell     string         `yaml:"shell" json:"shell"` // Any shell that can take -c to execute commands.
+	Arguments map[string]Arg `yaml:"arguments" json:"arguments"`
 }
 
 // Arg is a parameter passed to the task.
 type Arg struct {
-	Description string `yaml:"description"`
-	Default     string `yaml:"default"`
+	Description string `yaml:"description" json:"description"`
+	Default     string `yaml:"default" json:"default"`
 }
 
 // GetCmd returns the task's command as a CMD for the Docker
