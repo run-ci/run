@@ -1,0 +1,34 @@
+---
+# The branch(es) to run this pipeline for. Specified as
+# a regular expression. Will default to matching everything.
+branch: .*
+
+# The tags that this pipeline will run for. By default it
+# won't run for any tags.
+tag:
+
+# Pipeline runs are just a series of steps. The steps
+# themselves run in series.
+steps:
+# - test:
+#   # The top level of every step is a list of `run` tasks that
+#   # will execute in parallel.
+#   - fmt
+#   - test
+
+- build:
+  - build:
+      # `run` task arguments are the only things that can be
+      # overridden from a pipeline. This is to guarantee that
+      # what the user does is what the pipeline does.
+      arguments:
+        GOOS: linux
+
+# TODO: Figure out how this is gonna work
+# - deploy:
+
+# - integration:
+#   # The same `run` task can be used across different steps.
+#   - test:
+#       arguments:
+#         PACKAGE: ./integration
