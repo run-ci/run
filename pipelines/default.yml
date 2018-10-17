@@ -16,13 +16,14 @@ steps:
 #   - fmt
 #   - test
 
-- build:
-  - build:
-      # `run` task arguments are the only things that can be
-      # overridden from a pipeline. This is to guarantee that
-      # what the user does is what the pipeline does.
-      arguments:
-        GOOS: linux
+- name: build
+  tasks:
+    # `run` task arguments are the only things that can be
+    # overridden from a pipeline. This is to guarantee that
+    # what the user does is what the pipeline does.
+  - name: build
+    arguments:
+      GOOS: linux
 
 # TODO: Figure out how this is gonna work
 # - deploy:
