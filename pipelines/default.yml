@@ -1,3 +1,4 @@
+---
 # The branch(es) to run this pipeline for. Specified as
 # a regular expression. Will default to matching everything.
 branch: .*
