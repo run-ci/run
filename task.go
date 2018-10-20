@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"gitlab.com/run-ci/run/pkg/run"
+	"github.com/run-ci/run/pkg/run"
 	yaml "gopkg.in/yaml.v2"
 )
 

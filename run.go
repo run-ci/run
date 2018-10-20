@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"gitlab.com/run-ci/run/pkg/run"
+	"github.com/run-ci/run/pkg/run"
 )
 
 func runTask(name string) {

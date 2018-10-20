@@ -9,7 +9,7 @@ description: |
 
 image: golang:1.11-stretch
 
-mount: /go/src/gitlab.com/run-ci/run
+mount: /go/src/github.com/run-ci/run
 
 command: go build -v
 
