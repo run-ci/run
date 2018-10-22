@@ -3,7 +3,7 @@ version: "3"
 
 services:
   vault:
-    image: vault
+    image: vault:0.9.5
     cap_add:
     - IPC_LOCK
     environment:
@@ -11,3 +11,4 @@ services:
     - VAULT_DEV_LISTEN_ADDRESS
     ports:
     - "8200:8200"
+    command: server -dev -log-level=debug
