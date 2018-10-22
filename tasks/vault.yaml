@@ -1,0 +1,17 @@
+---
+summary: Output the value at the vault path.
+
+description: |
+  The `vault` task spits out the parameters passed to it
+  via the vault path.
+
+  This is useful for testing the `run` command.
+
+image: ubuntu:18.04
+
+command: echo $FOO
+
+arguments:
+  FOO:
+    description: An argument to pass to the task.
+    vault: /secret/foo:value

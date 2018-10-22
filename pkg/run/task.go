@@ -3,6 +3,9 @@ package run
 import (
 	"fmt"
 	"os"
+	"strings"
+
+	vault "github.com/hashicorp/vault/api"
 )
 
 type Task struct {
@@ -22,6 +25,7 @@ type Task struct {
 type Arg struct {
 	Description string `yaml:"description" json:"description"`
 	Default     string `yaml:"default" json:"default"`
+	Vault       string `yaml:"vault" json:"vault"`
 }
 
 // GetCmd returns the task's command as a CMD for the Docker
@@ -34,13 +38,38 @@ func (t Task) GetCmd() []string {
 }
 
 // GetEnv returns the task's arguments as key-value pairs.
+// If the argument is specified as a vault path (using
+// Arg.Vault), the value at that path is used instead of
+// the default value.
 // If the environment specifies an argument, that value is
-// used instead of the default value.
+// used instead of the default value or the Vault value.
 func (t Task) GetEnv() (map[string]string, error) {
 	env := map[string]string{}
 
 	for k, arg := range t.Arguments {
 		val := arg.Default
+
+		if arg.Vault != "" {
+			vaultcfg := vault.DefaultConfig()
+			if vaultcfg.Error != nil {
+				return nil, vaultcfg.Error
+			}
+
+			client, err := vault.NewClient(vaultcfg)
+			if err != nil {
+				return nil, err
+			}
+
+			segs := strings.Split(arg.Vault, ":")
+
+			secret, err := client.Logical().Read(segs[0])
+			if err != nil {
+				return nil, err
+			}
+
+			val = secret.Data[segs[1]].(string)
+		}
+
 		override := os.Getenv(k)
 		if override != "" {
 			val = override
