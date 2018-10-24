@@ -144,8 +144,8 @@ func (ag *Agent) RunContainer(spec ContainerSpec) (string, int, error) {
 			Stream:    true,
 			Logs:      true,
 
-			OutputStream: os.Stdout,
-			ErrorStream:  os.Stderr,
+			OutputStream: spec.OutputStream,
+			ErrorStream:  spec.ErrorStream,
 		}
 
 		err = ag.client.AttachToContainer(attachcfg)
