@@ -2,6 +2,7 @@ package run
 
 import (
 	"fmt"
+	"io"
 )
 
 // ContainerSpec defines everything that's needed to run a container.
@@ -10,6 +11,11 @@ type ContainerSpec struct {
 	Cmd    []string
 	Env    map[string]string
 	Mount  Mount
+
+	// These allow the container's output to be sent to places other than
+	// stdout or stderr. Useful for configuring different logging backends.
+	OutputStream io.Writer
+	ErrorStream  io.Writer
 }
 
 // Mount describes a volume mount in a container.

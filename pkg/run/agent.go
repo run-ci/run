@@ -87,6 +87,14 @@ func (ag *Agent) RunContainer(spec ContainerSpec) (string, int, error) {
 		return "", -1, errors.New("unknown mount type")
 	}
 
+	if spec.OutputStream == nil {
+		spec.OutputStream = os.Stdout
+	}
+
+	if spec.ErrorStream == nil {
+		spec.ErrorStream = os.Stderr
+	}
+
 	ccfg := &docker.Config{
 		Image:        spec.Imgref,
 		Cmd:          spec.Cmd,
