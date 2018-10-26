@@ -1,22 +1,25 @@
-package main
+package run
 
 import (
 	"fmt"
 	"io/ioutil"
 	"os"
 
-	"github.com/run-ci/run/pkg/run"
+	log "github.com/sirupsen/logrus"
 	yaml "gopkg.in/yaml.v2"
+
+	"github.com/run-ci/run/pkg/run"
 )
 
-// LoadTask loads a task from a YAML file and returns it.
+// LoadTask is a helper function that reads a task from the
+// filesystem and stores it in a Task struct.
 func LoadTask(name string) (run.Task, error) {
 	pwd, err := os.Getwd()
 	if err != nil {
 		return run.Task{}, err
 	}
 
-	printDebug("looking for tasks in %v", pwd)
+	log.Debugf("looking for tasks in %v", pwd)
 
 	path := fmt.Sprintf("%v/tasks/%v.yaml", pwd, name)
 	f, err := ioutil.ReadFile(path)
