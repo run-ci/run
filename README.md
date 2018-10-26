@@ -73,3 +73,8 @@ run -l
 ```
 
 3. Optionally, run `docker-compose` for other services like Vault.
+
+```
+source env/local
+docker-compose up
+```
