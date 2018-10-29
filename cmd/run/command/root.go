@@ -73,6 +73,8 @@ func init() {
 	flagDescribeTask = rootCmd.Flags().BoolP("describe", "d", false, "describe one or more tasks")
 }
 
+// listTasks takes the name of a directory in which your task yml files are
+// and iterates over each one, printing the name and summary of each task.
 func listTasks(taskDir string) error {
 	taskFiles, err := ioutil.ReadDir(taskDir)
 	if err != nil {
@@ -100,6 +102,8 @@ func listTasks(taskDir string) error {
 	return nil
 }
 
+// describeTask takes the name of a task and prints the contents of that task
+// for viewing in the command-line.
 func describeTask(taskName string) error {
 	task, err := run.LoadTask(taskName)
 	if err != nil {
