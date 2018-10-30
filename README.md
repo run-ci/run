@@ -66,10 +66,10 @@ Before you begin, make sure you have the following installed:
 git clone https://github.com/run-ci/run
 ```
 
-2. See what's available!
+2. See what tasks are available!
 
 ```
-run -l
+run list
 ```
 
 3. Optionally, run `docker-compose` for other services like Vault.

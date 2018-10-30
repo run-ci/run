@@ -75,6 +75,8 @@ github.com/hashicorp/vault/helper/jsonutil
 github.com/hashicorp/vault/helper/parseutil
 github.com/hashicorp/vault/helper/compressutil
 github.com/hashicorp/vault/helper/strutil
+# github.com/inconshreveable/mousetrap v1.0.0
+github.com/inconshreveable/mousetrap
 # github.com/mitchellh/go-homedir v1.0.0
 github.com/mitchellh/go-homedir
 # github.com/mitchellh/mapstructure v1.1.2
@@ -95,6 +97,8 @@ github.com/pkg/errors
 github.com/ryanuber/go-glob
 # github.com/sirupsen/logrus v1.0.6
 github.com/sirupsen/logrus
+# github.com/spf13/cobra v0.0.3
+github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.3
 github.com/spf13/pflag
 # golang.org/x/crypto v0.0.0-20180820150726-614d502a4dac
@@ -106,8 +110,8 @@ golang.org/x/net/http2/hpack
 golang.org/x/net/idna
 golang.org/x/net/context
 # golang.org/x/sys v0.0.0-20180830151530-49385e6e1522
-golang.org/x/sys/windows
 golang.org/x/sys/unix
+golang.org/x/sys/windows
 # golang.org/x/text v0.3.0
 golang.org/x/text/secure/bidirule
 golang.org/x/text/unicode/bidi
