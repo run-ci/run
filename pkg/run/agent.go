@@ -37,11 +37,9 @@ func NewAgent(client *docker.Client) (*Agent, error) {
 // present and pulls it if necessary. Set `verbose` to `true` to see the
 // Docker engine's output in stdout.
 func (ag *Agent) VerifyImagePresent(imgref string, verbose bool) error {
-	imgsegs := strings.Split(imgref, ":")
-
 	imgs, err := ag.client.ListImages(docker.ListImagesOptions{
 		All:    true,
-		Filter: imgsegs[0],
+		Filter: imgref,
 	})
 	if err != nil {
 		return err
@@ -50,6 +48,8 @@ func (ag *Agent) VerifyImagePresent(imgref string, verbose bool) error {
 	if len(imgs) > 0 {
 		return nil
 	}
+
+	imgsegs := strings.Split(imgref, ":")
 
 	pullopts := docker.PullImageOptions{
 		Repository: imgsegs[0],
