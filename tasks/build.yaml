@@ -11,7 +11,7 @@ image: golang:1.11-stretch
 
 mount: /go/src/github.com/run-ci/run
 
-command: go build -v
+command: go build -v -o run cmd/run/main.go
 
 arguments:
   GOOS:
